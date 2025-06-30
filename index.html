@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Tracker</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background: #f4f4f4; }
+        input, button { padding: 0.5rem; margin: 0.3rem 0; }
+        #positions li { margin: 0.3rem 0; }
+        .positive { color: green; }
+        .negative { color: red; }
+    </style>
+</head>
+<body>
+    <h1>📈 Profit Tracker</h1>
+    <label>Ціль ($): <input type="number" id="goal" /></label><br>
+    <label>Позиція ($): <input type="number" id="position" /></label>
+    <button onclick="addPosition()">Додати</button>
+    <h2>Статистика</h2>
+    <p>Зароблено: $<span id="total">0</span></p>
+    <p>Залишилось до цілі: $<span id="remaining">0</span></p>
+    <p>Кількість угод: <span id="count">0</span></p>
+    <ul id="positions"></ul>
+    <script>
+        let data = JSON.parse(localStorage.getItem("trackerData")) || { goal: 0, positions: [] };
+
+        const goalInput = document.getElementById("goal");
+        const positionInput = document.getElementById("position");
+        const totalSpan = document.getElementById("total");
+        const remainingSpan = document.getElementById("remaining");
+        const countSpan = document.getElementById("count");
+        const positionsList = document.getElementById("positions");
+
+        goalInput.value = data.goal;
+
+        goalInput.addEventListener("input", () => {
+            data.goal = parseFloat(goalInput.value) || 0;
+            save();
+            render();
+        });
+
+        function addPosition() {
+            const val = parseFloat(positionInput.value);
+            if (!isNaN(val)) {
+                data.positions.push({ value: val, time: new Date().toLocaleString() });
+                positionInput.value = "";
+                save();
+                render();
+            }
+        }
+
+        function deletePosition(index) {
+            data.positions.splice(index, 1);
+            save();
+            render();
+        }
+
+        function save() {
+            localStorage.setItem("trackerData", JSON.stringify(data));
+        }
+
+        function render() {
+            const total = data.positions.reduce((sum, pos) => sum + pos.value, 0);
+            totalSpan.textContent = total.toFixed(2);
+            remainingSpan.textContent = (data.goal - total).toFixed(2);
+            countSpan.textContent = data.positions.length;
+
+            positionsList.innerHTML = "";
+            data.positions.forEach((pos, i) => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span class="${pos.value >= 0 ? 'positive' : 'negative'}">${pos.value > 0 ? '+' : ''}${pos.value} $</span> — ${pos.time} <button onclick="deletePosition(${i})">❌</button>`;
+                positionsList.appendChild(li);
+            });
+        }
+
+        render();
+    </script>
+</body>
+</html>
