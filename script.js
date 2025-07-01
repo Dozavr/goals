@@ -72,9 +72,21 @@ function renderPositions() {
   container.innerHTML = "<h3>Позиції:</h3>";
   positions.forEach((p, i) => {
     const color = p >= 0 ? '#22c55e' : '#ef4444';
-    container.innerHTML += `<div class="position-item" style="color: ${color}">#${i + 1}: $${p.toFixed(2)}</div>`;
+    container.innerHTML += `
+      <div class="position-item" style="color: ${color}">
+        #${i + 1}: $${p.toFixed(2)}
+        <span style="margin-left:10px; color:#ccc; cursor:pointer;" onclick="deletePosition(${i})">✖</span>
+      </div>`;
   });
 }
+
+function deletePosition(index) {
+  positions.splice(index, 1);
+  localStorage.setItem("trackerPositions", JSON.stringify(positions));
+  updateStats();
+  renderPositions();
+}
+
 
 window.onload = function() {
   loadSettings();
