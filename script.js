@@ -48,11 +48,15 @@ function updateStats() {
   const remaining = settings.target - earned;
   const profitPerPos = settings.deposit * (settings.percent / 100);
   const neededPositions = Math.ceil(remaining / profitPerPos);
+  const wins = positions.filter(p => p > 0).length;
+  const losses = positions.filter(p => p < 0).length;
+
   document.getElementById("stats").innerHTML = `
     <b>Загальний прибуток:</b> $${earned.toFixed(2)}<br>
     <b>Залишилось до цілі:</b> $${remaining > 0 ? remaining.toFixed(2) : 0}<br>
     <b>Кількість позицій:</b> ${positions.length}<br>
-    <b>Наступна цільова позиція:</b> +$${profitPerPos.toFixed(2)}
+    <b>Наступна цільова позиція:</b> +$${profitPerPos.toFixed(2)}<br>
+    <b>Win / Loss:</b> ${wins} / ${losses}
   `;
 }
 
@@ -60,7 +64,8 @@ function renderPositions() {
   const container = document.getElementById("positionsList");
   container.innerHTML = "<h3>Позиції:</h3>";
   positions.forEach((p, i) => {
-    container.innerHTML += `<div class="position-item">#${i + 1}: $${p}</div>`;
+    const color = p >= 0 ? '#22c55e' : '#ef4444';
+    container.innerHTML += `<div class="position-item" style="color: ${color}">#${i + 1}: $${p.toFixed(2)}</div>`;
   });
 }
 
