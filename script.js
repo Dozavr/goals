@@ -1,4 +1,3 @@
-
 let settings = {
   deposit: 0,
   target: 0,
@@ -44,18 +43,26 @@ function loadPositions() {
 }
 
 function updateStats() {
-  const earned = positions.reduce((acc, val) => acc + val, 0);
+  let dynamicDeposit = settings.deposit;
+  let earned = 0;
+
+  positions.forEach(p => {
+    dynamicDeposit += p;
+    earned += p;
+  });
+
   const remaining = settings.target - earned;
-  const profitPerPos = settings.deposit * (settings.percent / 100);
-  const neededPositions = Math.ceil(remaining / profitPerPos);
+  const nextTarget = dynamicDeposit * (settings.percent / 100);
+  const neededPositions = nextTarget > 0 ? Math.ceil(remaining / nextTarget) : "-";
   const wins = positions.filter(p => p > 0).length;
   const losses = positions.filter(p => p < 0).length;
 
   document.getElementById("stats").innerHTML = `
+    <b>Поточний депозит:</b> $${dynamicDeposit.toFixed(2)}<br>
     <b>Загальний прибуток:</b> $${earned.toFixed(2)}<br>
     <b>Залишилось до цілі:</b> $${remaining > 0 ? remaining.toFixed(2) : 0}<br>
     <b>Кількість позицій:</b> ${positions.length}<br>
-    <b>Наступна цільова позиція:</b> +$${profitPerPos.toFixed(2)}<br>
+    <b>Наступна цільова позиція (${settings.percent}%):</b> +$${nextTarget.toFixed(2)}<br>
     <b>Win / Loss:</b> ${wins} / ${losses}
   `;
 }
@@ -75,3 +82,4 @@ window.onload = function() {
   updateStats();
   renderPositions();
 };
+
