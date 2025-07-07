@@ -52,6 +52,37 @@ function updateStats() {
   });
 
   const remaining = settings.target - earned;
+  const percent = settings.percent / 100;
+  const nextTarget = dynamicDeposit * percent;
+
+  // 🔢 Рахуємо скільки ще треба позицій з динамічним балансом
+  let simDeposit = dynamicDeposit;
+  let positionsNeeded = 0;
+  let totalToEarn = remaining;
+
+  while (totalToEarn > 0 && positionsNeeded < 9999) {
+    const gain = simDeposit * percent;
+    simDeposit += gain;
+    totalToEarn -= gain;
+    positionsNeeded++;
+  }
+
+  const wins = positions.filter(p => p > 0).length;
+  const losses = positions.filter(p => p < 0).length;
+
+  document.getElementById("stats").innerHTML = `
+    <b>Поточний депозит:</b> $${dynamicDeposit.toFixed(2)}<br>
+    <b>Загальний прибуток:</b> $${earned.toFixed(2)}<br>
+    <b>Залишилось до цілі:</b> $${remaining > 0 ? remaining.toFixed(2) : 0}<br>
+    <b>Кількість позицій:</b> ${positions.length}<br>
+    <b>Наступна цільова позиція (${settings.percent}%):</b> +$${nextTarget.toFixed(2)}<br>
+    <b>Win / Loss:</b> ${wins} / ${losses}<br>
+    <b>Позицій до цілі (динамічно):</b> ${positionsNeeded}
+  `;
+}
+
+
+  const remaining = settings.target - earned;
   const nextTarget = dynamicDeposit * (settings.percent / 100);
   const neededPositions = nextTarget > 0 ? Math.ceil(remaining / nextTarget) : "-";
   const wins = positions.filter(p => p > 0).length;
