@@ -3,6 +3,7 @@ let settings = {
   target: 0,
   percent: 0
 };
+
 let positions = [];
 
 function saveSettings() {
@@ -55,7 +56,7 @@ function updateStats() {
   const percent = settings.percent / 100;
   const nextTarget = dynamicDeposit * percent;
 
-  // 🔢 Рахуємо скільки ще треба позицій з динамічним балансом
+  // 🔁 Рахуємо скільки позицій ще потрібно до цілі з урахуванням скейлу
   let simDeposit = dynamicDeposit;
   let positionsNeeded = 0;
   let totalToEarn = remaining;
@@ -81,23 +82,6 @@ function updateStats() {
   `;
 }
 
-
-  const remaining = settings.target - earned;
-  const nextTarget = dynamicDeposit * (settings.percent / 100);
-  const neededPositions = nextTarget > 0 ? Math.ceil(remaining / nextTarget) : "-";
-  const wins = positions.filter(p => p > 0).length;
-  const losses = positions.filter(p => p < 0).length;
-
-  document.getElementById("stats").innerHTML = `
-    <b>Поточний депозит:</b> $${dynamicDeposit.toFixed(2)}<br>
-    <b>Загальний прибуток:</b> $${earned.toFixed(2)}<br>
-    <b>Залишилось до цілі:</b> $${remaining > 0 ? remaining.toFixed(2) : 0}<br>
-    <b>Кількість позицій:</b> ${positions.length}<br>
-    <b>Наступна цільова позиція (${settings.percent}%):</b> +$${nextTarget.toFixed(2)}<br>
-    <b>Win / Loss:</b> ${wins} / ${losses}
-  `;
-}
-
 function renderPositions() {
   const container = document.getElementById("positionsList");
   container.innerHTML = "<h3>Позиції:</h3>";
@@ -118,11 +102,9 @@ function deletePosition(index) {
   renderPositions();
 }
 
-
-window.onload = function() {
+window.onload = function () {
   loadSettings();
   loadPositions();
   updateStats();
   renderPositions();
 };
-
